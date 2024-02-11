@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Accounts</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .representative { 
+            margin-bottom: 30px; /* Increased separation */
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Enhanced shadow for better distinction */
+            overflow: hidden; /* Ensures no overflow */
+        }
+        h2 { 
+            font-size: 18px; /* Reduced font size */
+            color: #333;
+            margin: 0 0 10px 0; /* Adjusted margin for compactness */
+            white-space: nowrap; /* Prevents wrapping */
+            overflow: hidden; /* Hides overflow */
+            text-overflow: ellipsis; /* Adds ellipsis for overflow */
+        }
+        p {
+            margin: 0;
+            font-size: 14px; /* Adjusted for compactness */
+        }
+        .toggle-button { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            padding: 8px 10px; /* Reduced padding for compactness */
+            font-size: 14px; /* Reduced font size */
+            display: inline-block; /* Align with text */
+            margin-top: 10px; /* Adjusted margin */
+        }
+        .collapsible-content { display: none; }
+        .delegator-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .delegator-table th, .delegator-table td { 
+            text-align: left; 
+            padding: 8px; 
+            font-size: 14px; /* Adjusted font size for table */
+        }
+        .delegator-table th { background-color: #007bff; color: white; }
+        .delegator-table tr:nth-child(even) { background-color: #f2f2f2; }
+        form { margin-top: 15px; }
+        form input, form button { 
+            padding: 8px 10px; /* Reduced padding for compactness */
+            margin-right: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            font-size: 14px; /* Adjusted font size */
+        }
+        form button { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+        }
+        form button:hover, .toggle-button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    {% for rep_id, rep_data in account_info.items() %}
+        <div class="representative">
+            <h2>{{ rep_id }}</h2>
+            <p>Number of Delegators: {{ rep_data.delegators | length }} | Total Weight: {{ rep_data.sum_weight }}</p>
+            <button class="toggle-button" onclick="toggleVisibility(this)">Show</button>
+            <div class="collapsible-content">
+                <form action="{{ url_for('main.reassign_accounts') }}" method="post">
+                    <input type="hidden" name="rep_id" value="{{ rep_id }}">
+                    <input type="hidden" name="seed" value="{{ seed }}">
+                    <input type="number" name="skip_n" placeholder="Skip N" min="0" required>
+                    <input type="number" name="take_m" placeholder="Take M" min="1" required>
+                    <input type="text" name="new_rep" placeholder="New Rep" required>
+                    <button type="submit">Reassign</button>
+                </form>
+                <table class="delegator-table">
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th>Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for delegator in rep_data.delegators %}
+                            <tr>
+                                <td>{{ delegator.account }}</td>
+                                <td>{{ delegator.weight }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        function toggleVisibility(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                button.textContent = 'Hide';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Show';
+            }
+        }
+    </script>
+</body>
+</html>

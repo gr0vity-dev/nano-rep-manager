@@ -1,0 +1,11 @@
+version: '3'
+services:
+  nano-rep-manager:
+    build: ./nano_rep_manager
+    ports:
+      - "5222:5000"
+    container_name: nano-rep-manager
+    environment:
+      RPC_URL : ${RPC_URL}
+      AUTH_USERNAME : ${AUTH_USERNAME}
+      AUTH_PASSWORD : ${AUTH_PASSWORD}
